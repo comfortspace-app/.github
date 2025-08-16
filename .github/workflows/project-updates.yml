@@ -1,0 +1,24 @@
+name: Project Board Updates to Discord
+
+on:
+  project_card:
+    types: [created, moved, converted]
+
+jobs:
+  post_to_discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send project card update to Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          PROJECT_CARD_ACTION: ${{ github.event.action }}
+          PROJECT_CARD_URL: ${{ github.event.project_card.html_url }}
+          PROJECT_CARD_NOTE: ${{ github.event.project_card.note }}
+        uses: tsickert/discord-webhook@v5.3.0
+        with:
+          webhook: ${{ env.DISCORD_WEBHOOK }}
+          message: |
+            **Project Card Update**
+            - Action: `${{ env.PROJECT_CARD_ACTION }}`
+            - Card: `${{ env.PROJECT_CARD_NOTE }}`
+            - Link: ${{ env.PROJECT_CARD_URL }}
